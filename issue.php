@@ -19,11 +19,11 @@ mysqli_close($connection);
   <meta name="description" content="Comic Books Database">
   <link rel="stylesheet" type="text/css" href="style.css">
   <link rel="stylesheet" href="css/font-awesome.min.css">
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,900,700,300,100' rel='stylesheet' type='text/css'>
-  <link href='https://fonts.googleapis.com/css?family=Raleway:400,900italic,900,800italic,800,700italic,700,600italic,500italic,600,100,100italic,200,200italic,300,300italic,400italic,500' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700,900' rel='stylesheet' type='text/css'>
   <title>Comic Books Database</title>
 </head>
+
 <body>
 <div class="nav">
       <div class="logo">
@@ -35,11 +35,9 @@ mysqli_close($connection);
     </div>
   <header>
     <div class="content">
-      <h1 class="main-title">Search for your favorite comic books.</h1>
       <form action="search.php" method="post">
         <input type="text" name="search" id="search-text" placeholder="What are you looking for?">
         <select id="search-select" name="search-select">
-         <option value="all">All</option>
          <option value="title">Title</option>
          <option value="publisher">Publisher</option>
          <option value="character">Character</option>
@@ -50,18 +48,34 @@ mysqli_close($connection);
      </form>
    </div>
  </header>
-<section id="latest"></section>
-<section id="filter">
-<div class="container">
-<div class="content">
-<div class="left-column">
-<h3 class="sub-title">Search</h3>
-<h3 class="sub-title">Browse</h3>
-<h3 class="sub-title">Latest Releases</h3>
+ <section>
+  <div class="container">
+    <div class="content">
+ <?php
+  $query1 = mysqli_query($conn, "SELECT book_id, book_title, issue_number, image, publisher_name FROM Book INNER JOIN Publisher ON Book.publisher_id =Publisher.publisher_id WHERE book_id LIKE '".$_GET['id']."'") or die("Could not search.");
+  while($row = mysqli_fetch_array($query1)) {
+    $title = $row['book_title'];
+    $issue = $row['issue_number'];
+    $publisher = $row['publisher_name'];
+    $image = $row['image'];
+    $id = $row['book_id'];
+    $output = "<img src=".$image." alt='' class='cover'/><br>
+    <div class='cbbox'><div class='cbissue'>".$issue."</div><div class='cbinfo'>
+    <h3 class='cbtitle'>".$title."</h3>
+    <h3 class='cbpublisher'>".$publisher."</h3>
+    </div></div>";
+      echo $output;
+    }
+    $query2 = mysqli_query($conn, "SELECT Book.book_id, Person.person_name, Position.position FROM Book JOIN Creators ON Book.book_id = Creators.book_id JOIN Position ON Creators.position_id = Position.position_id JOIN Person ON Creators.person_id = Person.person_id WHERE Book.book_id LIKE '".$_GET['id']."'") or die("Could not search.");
+  while($row = mysqli_fetch_array($query2)) {
+    $person = $row['person_name'];
+    $position = $row['position'];
+      echo "<br>".$person."<br>";
+      echo $position;
+    }
+?>
 </div>
 </div>
-</div> 
 </section>
-<footer></footer>
 </body>
 </html>
